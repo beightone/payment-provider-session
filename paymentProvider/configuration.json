@@ -1,5 +1,5 @@
 {
-  "name": "WhollaConnector",
+  "name": "TreviPayConnector",
   "paymentMethods": [
     {
       "name": "Visa",
@@ -32,6 +32,16 @@
     {
       "name": "Mastercard",
       "allowsSplit": "onCapture"
+    }
+  ],
+  "customFields": [
+    {
+      "name": "Custom Field 1",
+      "type": "text"
+    },
+    {
+      "name": "Custom Field 2",
+      "type": "text"
     }
   ]
 }
