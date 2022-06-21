@@ -1,8 +1,16 @@
 {
-  "name": "TestSuitApprover",
+  "name": "WhollaConnector",
   "paymentMethods": [
     {
       "name": "Visa",
+      "allowsSplit": "onCapture"
+    },
+    {
+      "name": "Visa Electron",
+      "allowsSplit": "onCapture"
+    },
+    {
+      "name": "Visa Electron",
       "allowsSplit": "onCapture"
     },
     {
@@ -24,10 +32,6 @@
     {
       "name": "Mastercard",
       "allowsSplit": "onCapture"
-    },
-    {
-      "name": "BankInvoice",
-      "allowsSplit": "onAuthorize"
     }
   ]
 }

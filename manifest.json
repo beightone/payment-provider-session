@@ -25,6 +25,13 @@
         "host": "heimdall.vtexpayments.com.br",
         "path": "/api/payment-provider/callback/*"
       }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "trevipay.app",
+        "path": "/api/*"
+      }
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"

@@ -1,6 +1,7 @@
 import {
   AuthorizationRequest,
   AuthorizationResponse,
+  Authorizations,
   CancellationRequest,
   CancellationResponse,
   Cancellations,
@@ -15,7 +16,8 @@ import {
 import { VBase } from '@vtex/api'
 
 import { randomString } from './utils'
-import { executeAuthorization } from './flow'
+// import { executeAuthorization } from './flow'
+import { TreviPayClient } from './treviPayClient'
 
 const authorizationsBucket = 'authorizations'
 const persistAuthorizationResponse = async (
@@ -33,10 +35,8 @@ const getPersistedAuthorizationResponse = async (
     true
   )
 
-export default class TestSuiteApprover extends PaymentProvider {
-  // This class needs modifications to pass the test suit.
-  // Refer to https://help.vtex.com/en/tutorial/payment-provider-protocol#4-testing
-  // in order to learn about the protocol and make the according changes.
+export default class TreviPayConnector extends PaymentProvider {
+  private treviPayClient = new TreviPayClient(this.context, {})
 
   private async saveAndRetry(
     req: AuthorizationRequest,
@@ -46,6 +46,7 @@ export default class TestSuiteApprover extends PaymentProvider {
     this.callback(req, resp)
   }
 
+  // Create Payment
   public async authorize(
     authorization: AuthorizationRequest
   ): Promise<AuthorizationResponse> {
@@ -58,13 +59,41 @@ export default class TestSuiteApprover extends PaymentProvider {
       if (persistedResponse !== undefined && persistedResponse !== null) {
         return persistedResponse
       }
-
-      return executeAuthorization(authorization, response =>
-        this.saveAndRetry(authorization, response)
-      )
     }
 
-    throw new Error('Not implemented')
+    const {
+      status: treviPayAuthorizationStatus,
+      data: treviPayAuthorizationResult,
+    } = await this.treviPayClient.authorizations({
+      seller_id: 'SellerA',
+      buyer_id: authorization.miniCart.buyer.id ?? '',
+      currency: authorization.currency,
+      authorized_amount: authorization.value,
+    })
+
+    const treviPayTransactionId = randomString()
+    const { id, code, message } = treviPayAuthorizationResult
+
+    if (treviPayAuthorizationStatus === 201) {
+      return Authorizations.approve(authorization, {
+        authorizationId: id,
+        code,
+        message: message ?? 'Success Transaction',
+        tid: treviPayTransactionId,
+      })
+    }
+
+    return Authorizations.deny(authorization, {
+      authorizationId: id,
+      code,
+      message: message ?? 'Error Transaction',
+      tid: treviPayTransactionId,
+    })
+
+    // return executeAuthorization(authorization, response =>
+    //   this.saveAndRetry(authorization, response)
+    // )
+    // throw new Error('Not implemented')
   }
 
   public async cancel(
@@ -87,6 +116,7 @@ export default class TestSuiteApprover extends PaymentProvider {
     throw new Error('Not implemented')
   }
 
+  // Capture Payment
   public async settle(
     settlement: SettlementRequest
   ): Promise<SettlementResponse> {

@@ -1,7 +1,7 @@
 import { PaymentProviderService } from '@vtex/payment-provider'
 
-import TestSuiteApprover from './connector'
+import TreviPayConnector from './connector'
 
 export default new PaymentProviderService({
-  connector: TestSuiteApprover,
+  connector: TreviPayConnector,
 })
